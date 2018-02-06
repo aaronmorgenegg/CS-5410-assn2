@@ -1,21 +1,63 @@
 let previousTime = performance.now();
-let events = [];
 
-function addEvent(){
-    var name = document.getElementById("input-name").value;
-    var interval = document.getElementById("input-interval").value;
-    var count = document.getElementById("input-count").value;
-    var print_time = 0;
+function getCell(){
+    // Returns an empty cell
+    return {'u': false, 'r': false, 'd': false, 'l':false};
+}
 
-    if(name!==undefined && interval!==undefined && count!==undefined) {
-        events.push({"name": name, "interval": interval, "count": count, "print_time": print_time});
+function getGrid(size){
+    // Returns a grid of size X size, filled with empty cells
+    grid = [];
+    grid.size = size;
+    for(i = 0; i < size; i++){
+        row = [];
+        for(j = 0; j < size; j++){
+            row.push(getCell())
+        }
+        grid.push(row);
+    }
+    return grid;
+}
+
+function getOppositeDirection(direction){
+    if (direction === 'r') return 'l';
+    if (direction === 'u') return 'd';
+    if (direction === 'l') return 'r';
+    if (direction === 'd') return 'u';
+}
+
+function randomPrims(grid){
+    current_row = getRandomNumber(grid.size);
+    current_col = getRandomNumber(grid.size);
+    current_cell = grid[current_row][current_col];
+    visited = [current_cell];
+    walls = [[current_cell, 'u'], [current_cell, 'r'], [current_cell, 'd'], [current_cell, 'l']];
+    while(walls.length >= 0){
+        previous_cell = current_cell;
+        random_wall = walls[getRandomNumber(walls.length)];
+        if(random_wall[1] === 'u' && current_row > 0){
+            current_row -= 1;
+        } else if(random_wall[1] === 'r' && current_col < grid.size){
+            current_col += 1;
+        } else if(random_wall[1] === 'd' && current_row < grid.size){
+            current_row += 1;
+        } else if(random_wall[1] === 'l' && current_col > 0){
+            current_col -= 1;
+        }
+        if(!(grid[current_row][current_col] in visited)){
+            current_cell = grid[current_row][current_col];
+            previous_cell[random_wall[1]] = true;
+            current_cell[getOppositeDirection(random_wall[1])] = true;
+            // TODO add walls to the list
+        }
+
+        // TODO remove wall
     }
 }
 
-function printEvent(event){
-    var node = document.getElementById("events");
-    node.innerHTML += "Event: " + event.name + "(" + event.count + " remaining)<br>";
-    node.scrollTop = node.scrollHeight;
+function getMaze(size){
+    grid = getGrid(size);
+    maze = randomPrims(grid);
 }
 
 function processInput(elapsedTime){
@@ -23,26 +65,11 @@ function processInput(elapsedTime){
 }
 
 function update(elapsedTime){
-    for(var i = 0; i < events.length; i++){
-        if(events[i].print_time > events[i].interval){
-            events[i].print_time = 0;
-            events[i].count -= 1;
-            if(events[i].count<0){
-                delete events[i];
-            }
-        } else {
-            events[i].print_time += elapsedTime;
-        }
-    }
-    events = events.filter(function(n){ return n !== undefined });
+
 }
 
 function render(elapsedTime){
-    for(var i = 0; i < events.length; i++){
-        if(events[i].print_time > events[i].interval){
-            printEvent(events[i]);
-        }
-    }
+
 }
 
 function gameLoop(){
