@@ -41,8 +41,8 @@ function getOppositeDirection(direction){
 function getCellWalls(cell){
     // Get non-edge cell walls
     walls = [];
-    row = cell['coords']['row'];
-    col = cell['coords']['col'];
+    row = cell['coord']['row'];
+    col = cell['coord']['col'];
     if(cell['u'] === false){
         walls.push({'wall': cell['u'], 'direction': 'u', 'coord': {'row': row, 'col': col}});
     }
@@ -80,26 +80,23 @@ function randomPrims(grid){
     current_col = getRandomNumber(grid.size);
     current_cell = grid[current_row][current_col];
     current_cell['visited'] = true;
-    walls = [];
-    for(wall in getCellWalls(current_cell)) {
-        walls.push(wall)
-    }
+    walls = getCellWalls(current_cell);
 
     while(walls.length > 0){
         current_wall_index = getRandomNumber(walls.length);
         current_wall = walls[current_wall_index];
-        current_row = wall['coord']['row'];
-        current_col = wall['coord']['col'];
+        current_row = current_wall['coord']['row'];
+        current_col = current_wall['coord']['col'];
         current_cell = grid[current_row][current_col];
-        current_adj_cell = getAdjacentCell(grid, wall);
+        current_adj_cell = getAdjacentCell(grid, current_wall);
 
         if(current_adj_cell['visited']===false){
             current_cell[current_wall['direction']] = true;
             current_adj_cell[getOppositeDirection(current_wall['direction'])] = true;
             current_adj_cell['visited'] = true;
-            for(wall in getCellWalls(current_adj_cell)) {
-                walls.push(wall);
-            }
+            console.log(walls);
+            walls = walls.concat(getCellWalls(current_adj_cell));
+            console.log(walls);
             current_wall = true;
         }
 
@@ -112,12 +109,38 @@ function randomPrims(grid){
 function getMaze(size){
     grid = getGrid(size);
     maze = randomPrims(grid);
+    return maze;
 }
 
-maze = getMaze(10);
+//
+// ~~~~ TEST CODE ~~~~
+//
 
-for(i = 0; i < 10; i++){
-    for(j = 0; j < 10; j++){
-        console.log(maze[i][j])
-    }
-}
+//
+// function printMaze(maze){
+//     maze_str = "";
+//     for(i = 0; i < maze.size; i++){
+//         for(j = 0; j < maze.size; j++){
+//             if(maze[i][j]['d']===undefined || maze[i][j]['d']===false){
+//                 maze_str += "_";
+//             } else {
+//                 maze_str += " ";
+//             }
+//             if(maze[i][j]['r']===undefined || maze[i][j]['r']===false){
+//                 maze_str += "|";
+//             } else {
+//                 maze_str += " ";
+//             }
+//         }
+//         maze_str += "\n";
+//     }
+//     console.log(maze_str);
+// }
+//
+//
+// // console.log("Making Maze of size 10x10...");
+// grid = getGrid(10);
+// printMaze(grid);
+//
+// maze = getMaze(10);
+// printMaze(maze);
