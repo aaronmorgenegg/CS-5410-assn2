@@ -1,7 +1,14 @@
 function getCell(){
     // Returns an empty cell, where false means a wall exists, true means
     // a path exists, and undefined means an outside edge exists.
-    return {'u': false, 'r': false, 'd': false, 'l':false, 'visited': false, 'coord': {'row': undefined, 'col': undefined}};
+    return {'u': false,
+            'r': false,
+            'd': false,
+            'l':false,
+            'visited': false,
+            'coord': {'row': undefined, 'col': undefined},
+            'shortest_path': undefined
+    };
 }
 
 function getGrid(size){
@@ -59,6 +66,7 @@ function getCellWalls(cell){
 }
 
 function getAdjacentCell(grid, wall){
+    // Given a wall, get the cell on the other side of the wall
     current_row = wall['coord']['row'];
     current_col = wall['coord']['col'];
     if(wall['direction'] === 'u'){
@@ -103,13 +111,77 @@ function randomPrims(grid){
         walls.splice(current_wall_index, 1);
     }
 
+    for(i = 0; i < grid.size;i++){
+        for(j=0;j<grid.size;j++){
+            grid[i][j]['visited'] = false;
+        }
+    }
+
     return grid;
 }
 
 function getMaze(size){
     grid = getGrid(size);
     maze = randomPrims(grid);
+    maze.startPoint = {'coord': {'x': 0, 'y': 0}};
+    maze.endPoint = {'coord': {'x': maze.size-1, 'y': maze.size-1}};
+    saveShortestPaths(maze);
     return maze;
+}
+
+function getConnectedCell(maze, coord, direction){
+    row = coord['y'];
+    col = coord['x'];
+    if(direction==='u'){
+        if(maze[row][col][direction] === true){
+            return {'coord':{'x':col, 'y':row-1}};
+        }
+    }
+    if(direction==='r'){
+        if(maze[row][col][direction] === true){
+            return {'coord':{'x':col+1, 'y':row}};
+        }
+    }
+    if(direction==='d'){
+        if(maze[row][col][direction] === true){
+            return {'coord':{'x':col, 'y':row+1}};
+        }
+    }
+    if(direction==='l'){
+        if(maze[row][col][direction] === true){
+            return {'coord':{'x':col-1, 'y':row}};
+        }
+    }
+}
+
+function getShortestPath(maze, startPoint, endPoint){
+    // Solves the maze, returning a list of cells in the path
+    solutions = [[startPoint]];
+    while(solutions.length > 0){
+        path = solutions.pop();
+        for(direction in ['u', 'r', 'd', 'l']){
+            // Add new paths spreading in each viable direction
+            new_path = path;
+            connected_cell = getConnectedCell(maze, path[path.length-1]['coord'], 'u');
+            if(connected_cell !== undefined){
+                if(grid[connected_cell === endPoint]){
+                    return new_path.append(connected_cell);
+                }
+                solutions.push(new_path.append(connected_cell));
+            }
+        }
+
+    }
+}
+
+function saveShortestPaths(maze){
+    // Computes the shortest path for every single cell
+    for(i = 0; i < maze.size; i++){
+        for(j = 0; j < maze.size; j++){
+            cell = maze[i][j];
+            cell['shortest_path'] = getShortestPath(maze, cell['coord'], maze.endPoint);
+        }
+    }
 }
 
 //
