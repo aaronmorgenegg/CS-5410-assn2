@@ -82,6 +82,15 @@ function getAdjacentCell(grid, wall){
     }
 }
 
+function clearVisited(grid){
+    // Sets all visited attributes to false
+    for(i = 0; i < grid.size;i++){
+        for(j=0;j<grid.size;j++){
+            grid[i][j]['visited'] = false;
+        }
+    }
+}
+
 function randomPrims(grid){
     current_x = getRandomNumber(grid.size);
     current_y = getRandomNumber(grid.size);
@@ -108,11 +117,7 @@ function randomPrims(grid){
         walls.splice(current_wall_index, 1);
     }
 
-    for(i = 0; i < grid.size;i++){
-        for(j=0;j<grid.size;j++){
-            grid[i][j]['visited'] = false;
-        }
-    }
+    clearVisited(grid);
 }
 
 function getMaze(size){
@@ -163,7 +168,8 @@ function getShortestPath(maze, startPoint, endPoint){
                 if(connected_cell['visited'] !== true){
                     new_path.push(connected_cell);
                     if (connected_cell === endPoint){
-                            return new_path;
+                        clearVisited(maze);
+                        return new_path;
                     }
                     solutions.push(new_path);
                     connected_cell['visited'] = true;
@@ -171,6 +177,7 @@ function getShortestPath(maze, startPoint, endPoint){
             }
         }
     }
+    clearVisited(maze);
 }
 
 function renderMazeWalls(context, maze, cellBorder){
@@ -192,9 +199,19 @@ function renderMazeWalls(context, maze, cellBorder){
     }
 }
 
-function renderMazeShortestPath(context, maze, cellBorder, textures){
-    if(options['bread_crumbs']) {
-        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) {
+function renderMazeShortestPath(context, maze, cellBorder, textures, options){
+    if(options['show_path']) {
+        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
+            xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
+            yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
+            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 10, height = 10);
+        }
+    }
+}
+
+function renderMazeVisited(context, maze, cellBorder, textures, options){
+    if(options['show_visited']) {
+        if (maze[i][j]['visited']) {
             xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
             yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
             context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 20, height = 20);
@@ -202,7 +219,20 @@ function renderMazeShortestPath(context, maze, cellBorder, textures){
     }
 }
 
-function renderMaze(canvas, context, options, maze, textures){
+function renderPlayer(context, maze, textures, player, xOffset, yOffset){
+    context.drawImage(
+        img = textures['player'],
+        x = xOffset*player['coord']['x'],
+        y = yOffset*player['coord']['y'],
+        width = xOffset,
+        height = yOffset
+    );
+}
+
+function renderMaze(canvas, context, game_data){
+    maze = game_data['maze'];
+    textures = game_data['textures'];
+    player = game_data['player'];
 
     // clearCanvas(canvas, context);
 
@@ -218,16 +248,27 @@ function renderMaze(canvas, context, options, maze, textures){
         }
     );
     context.beginPath();
+    xOffset = canvas.width/maze.size;
+    yOffset = canvas.height/maze.size;
     for(i = 0; i < maze.size; i++){
         for(j = 0; j < maze.size; j++){
-            xOffset = canvas.width/maze.size;
-            yOffset = canvas.height/maze.size;
-            cellBorder = {'y1': j*yOffset, 'x1': i*xOffset, 'y2': j*yOffset+yOffset, 'x2': i*xOffset+xOffset};
+            cellBorder = {
+                'xOffset': xOffset,
+                'yOffset': yOffset,
+                'y1': j*yOffset,
+                'x1': i*xOffset,
+                'y2': j*yOffset+yOffset,
+                'x2': i*xOffset+xOffset
+            };
 
             renderMazeWalls(context, maze, cellBorder);
-            renderMazeShortestPath(context, maze, cellBorder, textures);
+            renderMazeShortestPath(context, maze, cellBorder, textures, options);
+            renderMazeVisited(context, maze, cellBorder, textures, options);
         }
     }
+
+    renderPlayer(context, maze, textures, player, xOffset, yOffset);
+
     context.strokeStyle = '#f00';
     context.lineWidth = 3;
     context.stroke();
