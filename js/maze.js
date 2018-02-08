@@ -6,8 +6,7 @@ function getCell(){
             'd': false,
             'l':false,
             'visited': false,
-            'coord': {'x': undefined, 'y': undefined},
-            'shortest_path': undefined
+            'coord': {'x': undefined, 'y': undefined}
     };
 }
 
@@ -119,9 +118,9 @@ function randomPrims(grid){
 function getMaze(size){
     grid = getGrid(size);
     randomPrims(grid);
-    grid.startPoint = {'coord': {'x': 0, 'y': 0}};
-    grid.endPoint = {'coord': {'x': grid.size-1, 'y': grid.size-1}};
-    // saveShortestPaths(grid); // TODO fix this
+    grid.startPoint = grid[0][0];
+    grid.endPoint = grid[grid.size-1][grid.size-1];
+    grid.shortest_path = getShortestPath(grid, grid.startPoint, grid.endPoint);
     return grid;
 }
 
@@ -130,63 +129,80 @@ function getConnectedCell(maze, coord, direction){
     y = coord['y'];
     if(direction==='u'){
         if(maze[x][y][direction] === true){
-            return {'x':x, 'y':y-1};
+            return maze[x][y-1];
         }
     }
     if(direction==='r'){
         if(maze[x][y][direction] === true){
-            return {'x':x+1, 'y':y};
+            return maze[x+1][y];
         }
     }
     if(direction==='d'){
         if(maze[x][y][direction] === true){
-            return {'x':x, 'y':y+1};
+            return maze[x][y+1];
         }
     }
     if(direction==='l'){
         if(maze[x][y][direction] === true){
-            return {'x':x-1, 'y':y};
+            return maze[x-1][y];
         }
     }
 }
 
 function getShortestPath(maze, startPoint, endPoint){
     // Solves the maze, returning a list of coordinates to cells in the path
-    // if(startPoint===endPoint) return [endPoint['coord']];
-    solutions = [[startPoint['coord']]];
+    solutions = [[startPoint]];
     directions = ['u', 'r', 'd', 'l'];
     while(solutions.length > 0){
-        console.log(solutions);
         path = solutions.pop();
         for(i = 0; i < directions.length; i++){
             // Add new paths spreading in each viable direction
             new_path = path.slice();
-            connected_cell = getConnectedCell(maze, path[path.length-1], directions[i]);
+            connected_cell = getConnectedCell(maze, new_path[new_path.length-1]['coord'], directions[i]);
             if(connected_cell !== undefined){
-                new_path.push(connected_cell);
-                if(maze[connected_cell['x']][connected_cell['y']] === endPoint){
-                    return (new_path);
-                }
-                if(maze[connected_cell['x']][connected_cell['y']]['visited']===false) {
+                if(connected_cell['visited'] !== true){
+                    new_path.push(connected_cell);
+                    if (connected_cell === endPoint){
+                            return new_path;
+                    }
                     solutions.push(new_path);
-                    maze[connected_cell['x']][connected_cell['y']]['visited'] = true;
+                    connected_cell['visited'] = true;
                 }
             }
         }
     }
 }
 
-function saveShortestPaths(maze){
-    // Computes the shortest path for every single cell
-    for(i = 0; i < maze.size; i++){
-        for(j = 0; j < maze.size; j++){
-            cell = maze[i][j];
-            cell['shortest_path'] = getShortestPath(maze, cell, maze.endPoint);
+function renderMazeWalls(context, maze, cellBorder){
+    if(maze[i][j]['u'] !== true){
+        context.moveTo(cellBorder['x1'], cellBorder['y1']);
+        context.lineTo(cellBorder['x2'], cellBorder['y1']);
+    }
+    if(maze[i][j]['r'] !== true){
+        context.moveTo(cellBorder['x2'], cellBorder['y1']);
+        context.lineTo(cellBorder['x2'], cellBorder['y2']);
+    }
+    if(maze[i][j]['d'] !== true){
+        context.moveTo(cellBorder['x2'], cellBorder['y2']);
+        context.lineTo(cellBorder['x1'], cellBorder['y2']);
+    }
+    if(maze[i][j]['l'] !== true){
+        context.moveTo(cellBorder['x1'], cellBorder['y2']);
+        context.lineTo(cellBorder['x1'], cellBorder['y1']);
+    }
+}
+
+function renderMazeShortestPath(context, maze, cellBorder, textures){
+    if(options['bread_crumbs']) {
+        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) {
+            xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
+            yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
+            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 20, height = 20);
         }
     }
 }
 
-function renderMaze(canvas, context, maze){
+function renderMaze(canvas, context, options, maze, textures){
 
     // clearCanvas(canvas, context);
 
@@ -207,22 +223,9 @@ function renderMaze(canvas, context, maze){
             xOffset = canvas.width/maze.size;
             yOffset = canvas.height/maze.size;
             cellBorder = {'y1': j*yOffset, 'x1': i*xOffset, 'y2': j*yOffset+yOffset, 'x2': i*xOffset+xOffset};
-            if(maze[i][j]['u'] !== true){
-                context.moveTo(cellBorder['x1'], cellBorder['y1']);
-                context.lineTo(cellBorder['x2'], cellBorder['y1']);
-            }
-            if(maze[i][j]['r'] !== true){
-                context.moveTo(cellBorder['x2'], cellBorder['y1']);
-                context.lineTo(cellBorder['x2'], cellBorder['y2']);
-            }
-            if(maze[i][j]['d'] !== true){
-                context.moveTo(cellBorder['x2'], cellBorder['y2']);
-                context.lineTo(cellBorder['x1'], cellBorder['y2']);
-            }
-            if(maze[i][j]['l'] !== true){
-                context.moveTo(cellBorder['x1'], cellBorder['y2']);
-                context.lineTo(cellBorder['x1'], cellBorder['y1']);
-            }
+
+            renderMazeWalls(context, maze, cellBorder);
+            renderMazeShortestPath(context, maze, cellBorder, textures);
         }
     }
     context.strokeStyle = '#f00';
