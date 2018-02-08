@@ -6,7 +6,7 @@ function getCell(){
             'd': false,
             'l':false,
             'visited': false,
-            'coord': {'row': undefined, 'col': undefined},
+            'coord': {'x': undefined, 'y': undefined},
             'shortest_path': undefined
     };
 }
@@ -20,8 +20,8 @@ function getGrid(size){
         row = [];
         for(j = 0; j < size; j++){
             cell = getCell();
-            cell['coord']['row'] = i;
-            cell['coord']['col'] = j;
+            cell['coord']['x'] = i;
+            cell['coord']['y'] = j;
             row.push(cell)
 
         }
@@ -30,10 +30,10 @@ function getGrid(size){
 
     // edge cases -- literally
     for(i = 0; i < size; i++){
-        grid[i][0]['l'] = undefined;
-        grid[0][i]['u'] = undefined;
-        grid[i][size-1]['r'] = undefined;
-        grid[size-1][i]['d'] = undefined;
+        grid[i][0]['u'] = undefined;
+        grid[size-1][i]['r'] = undefined;
+        grid[i][size-1]['d'] = undefined;
+        grid[0][i]['l'] = undefined;
     }
     return grid;
 }
@@ -48,63 +48,61 @@ function getOppositeDirection(direction){
 function getCellWalls(cell){
     // Get non-edge cell walls
     walls = [];
-    row = cell['coord']['row'];
-    col = cell['coord']['col'];
+    x = cell['coord']['x'];
+    y = cell['coord']['y'];
     if(cell['u'] === false){
-        walls.push({'wall': cell['u'], 'direction': 'u', 'coord': {'row': row, 'col': col}});
+        walls.push({'direction': 'u', 'coord': {'x': x, 'y': y}});
     }
     if(cell['r'] === false){
-        walls.push({'wall': cell['r'], 'direction': 'r', 'coord': {'row': row, 'col': col}});
+        walls.push({'direction': 'r', 'coord': {'x': x, 'y': y}});
     }
     if(cell['d'] === false){
-        walls.push({'wall': cell['d'], 'direction': 'd', 'coord': {'row': row, 'col': col}});
+        walls.push({'direction': 'd', 'coord': {'x': x, 'y': y}});
     }
     if(cell['l'] === false){
-        walls.push({'wall': cell['l'], 'direction': 'l', 'coord': {'row': row, 'col': col}});
+        walls.push({'direction': 'l', 'coord': {'x': x, 'y': y}});
     }
-    return walls
+    return walls;
 }
 
 function getAdjacentCell(grid, wall){
     // Given a wall, get the cell on the other side of the wall
-    current_row = wall['coord']['row'];
-    current_col = wall['coord']['col'];
+    current_x = wall['coord']['x'];
+    current_y = wall['coord']['y'];
     if(wall['direction'] === 'u'){
-        return grid[current_row-1][current_col];
+        return grid[current_x][current_y-1];
     }
     if(wall['direction'] === 'r'){
-        return grid[current_row][current_col+1];
+        return grid[current_x+1][current_y];
     }
     if(wall['direction'] === 'd'){
-        return grid[current_row+1][current_col];
+        return grid[current_x][current_y+1];
     }
     if(wall['direction'] === 'l'){
-        return grid[current_row][current_col-1];
+        return grid[current_x-1][current_y];
     }
 }
 
 function randomPrims(grid){
-    current_row = getRandomNumber(grid.size);
-    current_col = getRandomNumber(grid.size);
-    current_cell = grid[current_row][current_col];
+    current_x = getRandomNumber(grid.size);
+    current_y = getRandomNumber(grid.size);
+    current_cell = grid[current_x][current_y];
     current_cell['visited'] = true;
     walls = getCellWalls(current_cell);
 
     while(walls.length > 0){
         current_wall_index = getRandomNumber(walls.length);
         current_wall = walls[current_wall_index];
-        current_row = current_wall['coord']['row'];
-        current_col = current_wall['coord']['col'];
-        current_cell = grid[current_row][current_col];
+        current_x = current_wall['coord']['x'];
+        current_y = current_wall['coord']['y'];
+        current_cell = grid[current_x][current_y];
         current_adj_cell = getAdjacentCell(grid, current_wall);
 
         if(current_adj_cell['visited']===false){
             current_cell[current_wall['direction']] = true;
             current_adj_cell[getOppositeDirection(current_wall['direction'])] = true;
             current_adj_cell['visited'] = true;
-            console.log(walls);
             walls = walls.concat(getCellWalls(current_adj_cell));
-            console.log(walls);
             current_wall = true;
         }
 
@@ -116,61 +114,65 @@ function randomPrims(grid){
             grid[i][j]['visited'] = false;
         }
     }
-
-    return grid;
 }
 
 function getMaze(size){
     grid = getGrid(size);
-    maze = randomPrims(grid);
-    maze.startPoint = {'coord': {'x': 0, 'y': 0}};
-    maze.endPoint = {'coord': {'x': maze.size-1, 'y': maze.size-1}};
-    saveShortestPaths(maze);
-    return maze;
+    randomPrims(grid);
+    grid.startPoint = {'coord': {'x': 0, 'y': 0}};
+    grid.endPoint = {'coord': {'x': grid.size-1, 'y': grid.size-1}};
+    // saveShortestPaths(grid); // TODO fix this
+    return grid;
 }
 
 function getConnectedCell(maze, coord, direction){
-    row = coord['y'];
-    col = coord['x'];
+    x = coord['x'];
+    y = coord['y'];
     if(direction==='u'){
-        if(maze[row][col][direction] === true){
-            return {'coord':{'x':col, 'y':row-1}};
+        if(maze[x][y][direction] === true){
+            return {'x':x, 'y':y-1};
         }
     }
     if(direction==='r'){
-        if(maze[row][col][direction] === true){
-            return {'coord':{'x':col+1, 'y':row}};
+        if(maze[x][y][direction] === true){
+            return {'x':x+1, 'y':y};
         }
     }
     if(direction==='d'){
-        if(maze[row][col][direction] === true){
-            return {'coord':{'x':col, 'y':row+1}};
+        if(maze[x][y][direction] === true){
+            return {'x':x, 'y':y+1};
         }
     }
     if(direction==='l'){
-        if(maze[row][col][direction] === true){
-            return {'coord':{'x':col-1, 'y':row}};
+        if(maze[x][y][direction] === true){
+            return {'x':x-1, 'y':y};
         }
     }
 }
 
 function getShortestPath(maze, startPoint, endPoint){
-    // Solves the maze, returning a list of cells in the path
-    solutions = [[startPoint]];
+    // Solves the maze, returning a list of coordinates to cells in the path
+    // if(startPoint===endPoint) return [endPoint['coord']];
+    solutions = [[startPoint['coord']]];
+    directions = ['u', 'r', 'd', 'l'];
     while(solutions.length > 0){
+        console.log(solutions);
         path = solutions.pop();
-        for(direction in ['u', 'r', 'd', 'l']){
+        for(i = 0; i < directions.length; i++){
             // Add new paths spreading in each viable direction
-            new_path = path;
-            connected_cell = getConnectedCell(maze, path[path.length-1]['coord'], 'u');
+            new_path = path.slice();
+            connected_cell = getConnectedCell(maze, path[path.length-1], directions[i]);
             if(connected_cell !== undefined){
-                if(grid[connected_cell === endPoint]){
-                    return new_path.append(connected_cell);
+                new_path.push(connected_cell);
+                if(maze[connected_cell['x']][connected_cell['y']] === endPoint){
+                    return (new_path);
                 }
-                solutions.push(new_path.append(connected_cell));
+                if(maze[connected_cell['x']][connected_cell['y']]['visited']===false) {
+                    solutions.push(new_path);
+                    maze[connected_cell['x']][connected_cell['y']]['visited'] = true;
+                }
             }
         }
-
     }
 }
 
@@ -179,40 +181,51 @@ function saveShortestPaths(maze){
     for(i = 0; i < maze.size; i++){
         for(j = 0; j < maze.size; j++){
             cell = maze[i][j];
-            cell['shortest_path'] = getShortestPath(maze, cell['coord'], maze.endPoint);
+            cell['shortest_path'] = getShortestPath(maze, cell, maze.endPoint);
         }
     }
 }
 
-//
-// ~~~~ TEST CODE ~~~~
-//
+function renderMaze(canvas, context, maze){
 
-//
-// function printMaze(maze){
-//     maze_str = "";
-//     for(i = 0; i < maze.size; i++){
-//         for(j = 0; j < maze.size; j++){
-//             if(maze[i][j]['d']===undefined || maze[i][j]['d']===false){
-//                 maze_str += "_";
-//             } else {
-//                 maze_str += " ";
-//             }
-//             if(maze[i][j]['r']===undefined || maze[i][j]['r']===false){
-//                 maze_str += "|";
-//             } else {
-//                 maze_str += " ";
-//             }
-//         }
-//         maze_str += "\n";
-//     }
-//     console.log(maze_str);
-// }
-//
-//
-// // console.log("Making Maze of size 10x10...");
-// grid = getGrid(10);
-// printMaze(grid);
-//
-// maze = getMaze(10);
-// printMaze(maze);
+    // clearCanvas(canvas, context);
+
+    // Background
+    drawRectangle(context,
+        {
+            x : 0,
+            y : 0,
+            width : canvas.width,
+            height : canvas.height,
+            fill : 'rgba(55, 55, 55, 1)',
+            stroke : 'rgba(0, 0, 0, 1)'
+        }
+    );
+    context.beginPath();
+    for(i = 0; i < maze.size; i++){
+        for(j = 0; j < maze.size; j++){
+            xOffset = canvas.width/maze.size;
+            yOffset = canvas.height/maze.size;
+            cellBorder = {'y1': j*yOffset, 'x1': i*xOffset, 'y2': j*yOffset+yOffset, 'x2': i*xOffset+xOffset};
+            if(maze[i][j]['u'] !== true){
+                context.moveTo(cellBorder['x1'], cellBorder['y1']);
+                context.lineTo(cellBorder['x2'], cellBorder['y1']);
+            }
+            if(maze[i][j]['r'] !== true){
+                context.moveTo(cellBorder['x2'], cellBorder['y1']);
+                context.lineTo(cellBorder['x2'], cellBorder['y2']);
+            }
+            if(maze[i][j]['d'] !== true){
+                context.moveTo(cellBorder['x2'], cellBorder['y2']);
+                context.lineTo(cellBorder['x1'], cellBorder['y2']);
+            }
+            if(maze[i][j]['l'] !== true){
+                context.moveTo(cellBorder['x1'], cellBorder['y2']);
+                context.lineTo(cellBorder['x1'], cellBorder['y1']);
+            }
+        }
+    }
+    context.strokeStyle = '#f00';
+    context.lineWidth = 3;
+    context.stroke();
+}

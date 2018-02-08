@@ -1,4 +1,5 @@
 let previousTime = performance.now();
+let maze = getMaze(20);
 
 function processInput(elapsedTime){
 
@@ -9,7 +10,9 @@ function update(elapsedTime){
 }
 
 function render(elapsedTime){
-
+    let canvas = document.getElementById('canvas-main');
+    let context = canvas.getContext('2d');
+    renderMaze(canvas, context, maze);
 }
 
 function gameLoop(){
