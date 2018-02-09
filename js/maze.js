@@ -209,6 +209,16 @@ function renderMazeShortestPath(context, maze, cellBorder, textures, options){
     }
 }
 
+function renderMazeHelp(context, maze, cellBorder, textures, options){
+    if(options['show_help']) {
+        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
+            xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
+            yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
+            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 10, height = 10);
+        }
+    }
+}
+
 function renderMazeVisited(context, maze, cellBorder, textures, options){
     if(options['show_visited']) {
         if (maze[i][j]['visited']) {
@@ -229,7 +239,7 @@ function renderPlayer(context, maze, textures, player, xOffset, yOffset){
     );
 }
 
-function renderMaze(canvas, context, game_data){
+function renderMaze(canvas, context){
     maze = game_data['maze'];
     textures = game_data['textures'];
     player = game_data['player'];
@@ -263,6 +273,7 @@ function renderMaze(canvas, context, game_data){
 
             renderMazeWalls(context, maze, cellBorder);
             renderMazeShortestPath(context, maze, cellBorder, textures, options);
+            // renderMazeHelp(context, maze, cellBorder, textures, options);
             renderMazeVisited(context, maze, cellBorder, textures, options);
         }
     }

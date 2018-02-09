@@ -7,7 +7,17 @@
 </head>
 <body>
 	<img id="icon_bread" width="1" height="1" src="images/icon_bread.png">
-	<canvas id = "canvas-main" width = "1000" height = "1000"></canvas>
+	<img id="icon_mouse" width="1" height="1" src="images/icon_mouse.png">
+	<img id="icon_cheese" width="1" height="1" src="images/icon_cheese.svg">
+	<img id="icon_home" width="1" height="1" src="images/icon_home.jpg">
+	<canvas id = "canvas_main" width = "1000" height = "1000"></canvas>
+
+	<div id="gui">
+		<input type="button" id="button_5x5" onclick="updateMazeSize(5)" value="5x5">
+		<input type="button" id="button_10x10" onclick="updateMazeSize(10)" value="10x10">
+		<input type="button" id="button_15x15" onclick="updateMazeSize(15)" value="15x15">
+		<input type="button" id="button_20x20" onclick="updateMazeSize(20)" value="20x20">
+	</div>
 
 	<script src="js/utils.js"></script>
 	<script src="js/renderUtils.js"></script>
