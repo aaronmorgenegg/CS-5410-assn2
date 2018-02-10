@@ -202,41 +202,66 @@ function renderMazeWalls(context, maze, cellBorder){
 function renderMazeShortestPath(context, maze, cellBorder, textures, options){
     if(options['show_path']) {
         if (maze['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
+            w = cellBorder['xOffset']/4;
+            h = cellBorder['yOffset']/4;
             xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
             yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
-            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 10, height = 10);
+            context.drawImage(img = textures['path_marker'], x = xAvg - w/2, y = yAvg - h/2, width = w, height = h);
         }
     }
 }
 
-function renderMazeHelp(context, maze, cellBorder, textures, options){
+function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset){
+    pX = player['coord']['x'];
+    pY = player['coord']['y'];
+    player_path_index = maze['shortest_path'].indexOf(maze[pX][pY]);
     if(options['show_help']) {
-        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
-            xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
-            yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
-            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 10, height = 10);
+        if (player_path_index > -1) { // if cell is in shortest path
+            cell = maze['shortest_path'][player_path_index+1]
+            ppiX = cell['coord']['x'];
+            ppiY = cell['coord']['y'];
+            context.drawImage(
+                img = textures['help_marker'],
+                x = xOffset * ppiX,
+                y = yOffset * ppiY,
+                width = xOffset,
+                height = yOffset);
         }
     }
+    // TODO: handle if the player is not already on the shortest path
+    // TODO: need to implement stack of misplays
 }
 
 function renderMazeVisited(context, maze, cellBorder, textures, options){
     if(options['show_visited']) {
         if (maze[i][j]['visited']) {
+            w = cellBorder['xOffset']/4;
+            h = cellBorder['yOffset']/4;
             xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
             yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
-            context.drawImage(img = textures['bread_crumbs'], x = xAvg - 10, y = yAvg - 10, width = 20, height = 20);
+            context.drawImage(img = textures['bread_crumbs'], x = xAvg - w, y = yAvg - h, width = w, height = h);
         }
     }
 }
 
 function renderPlayer(context, maze, textures, player, xOffset, yOffset){
+    pX = player['coord']['x'];
+    pY = player['coord']['y'];
     context.drawImage(
         img = textures['player'],
-        x = xOffset*player['coord']['x'],
-        y = yOffset*player['coord']['y'],
+        x = xOffset*pX,
+        y = yOffset*pY,
         width = xOffset,
         height = yOffset
     );
+}
+
+function renderHome(context, maze, textures, xOffset, yOffset){
+
+}
+
+function renderEnd(context, maze, textures, xOffset, yOffset){
+    
 }
 
 function renderMaze(canvas, context){
@@ -273,12 +298,14 @@ function renderMaze(canvas, context){
 
             renderMazeWalls(context, maze, cellBorder);
             renderMazeShortestPath(context, maze, cellBorder, textures, options);
-            // renderMazeHelp(context, maze, cellBorder, textures, options);
             renderMazeVisited(context, maze, cellBorder, textures, options);
         }
     }
 
     renderPlayer(context, maze, textures, player, xOffset, yOffset);
+    renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset);
+    renderHome(context, maze, textures, xOffset, yOffset);
+    renderEnd(context, maze, textures, xOffset, yOffset);
 
     context.strokeStyle = '#f00';
     context.lineWidth = 3;

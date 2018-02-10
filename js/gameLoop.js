@@ -2,7 +2,6 @@ game_data = {};
 
 function ititialize(){
     // Initializes the textures, options, and calls gameLoop
-    time = performance.now();
     bread_crumbs = document.getElementById("icon_bread");
     player = document.getElementById("icon_mouse");
     cheese = document.getElementById("icon_cheese");
@@ -12,6 +11,7 @@ function ititialize(){
         'start': home,
         'end': cheese,
         'path_marker': bread_crumbs,
+        'help_marker': bread_crumbs,
         'player': player
     };
     options = {
@@ -25,9 +25,10 @@ function ititialize(){
         'options':options,
         'maze':maze,
         'time':{
-            'previous':time,
-            'current':time,
-            'elapsed':time
+            'previous':performance.now(),
+            'current':0,
+            'elapsed':0,
+            'running':0
         },
         'player':{
             'coord':{
@@ -41,10 +42,11 @@ function ititialize(){
 }
 
 function processInput(){
-
+    
 }
 
 function update(){
+    updateTime();
 }
 
 function render(){
@@ -52,12 +54,13 @@ function render(){
     context = canvas.getContext('2d');
 
     renderMaze(canvas, context);
+    renderTime();
+    renderScore();
 }
 
 function gameLoop(){
-    game_data['time']['current'] = performance.now();
-    game_data['time']['elapsed'] = game_data['time']['current'] - game_data['previous_time'];
-    game_data['time']['previous'] = game_data['time']['current'];
+    // console.log(game_data['time']);
+    updateTime();
 
     processInput();
     update();

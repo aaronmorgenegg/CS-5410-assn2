@@ -40,3 +40,19 @@ function resetGame(){
     game_data['player']['coord'] = {'x': 0, 'y': 0};
     game_data['player']['score'] = 0;
 }
+
+function renderTime(){
+    document.getElementById('time').innerHTML = "Time: " + Math.floor(game_data['time']['running'] / 1000);
+}
+
+function renderScore(){
+    document.getElementById('score').innerHTML = "Score: " + game_data['player']['score'];
+}
+
+function updateTime(){
+    // console.log(game_data['time']);
+    game_data['time']['current'] = performance.now();
+    game_data['time']['elapsed'] = (game_data['time']['current'] - game_data['time']['previous']);
+    game_data['time']['running'] += game_data['time']['elapsed'];
+    game_data['time']['previous'] = game_data['time']['current'];
+}
