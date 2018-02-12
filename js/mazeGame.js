@@ -46,7 +46,19 @@ function renderTime(){
 }
 
 function renderScore(){
-    document.getElementById('score').innerHTML = "Score: " + game_data['player']['score'];
+    if(game_data['options']['show_score']) {
+        document.getElementById('score').innerHTML = "Score: " + game_data['player']['score'];
+    } else {
+        document.getElementById('score').innerHTML = "Score: Hidden";
+    }
+}
+
+function renderHighScores(){
+    text = "High Scores: <br>";
+    for(i = 0; i < game_data['scores'].length; i++){
+        text += game_data['scores'][i]['name'] + " : " + game_data['scores'][i]['score'] + "<br>";
+    }
+    document.getElementById('high_scores').innerHTML = text;
 }
 
 function updateTime(){
@@ -55,4 +67,8 @@ function updateTime(){
     game_data['time']['elapsed'] = (game_data['time']['current'] - game_data['time']['previous']);
     game_data['time']['running'] += game_data['time']['elapsed'];
     game_data['time']['previous'] = game_data['time']['current'];
+}
+
+function toggleScoreDisplay(){
+    game_data['options']['show_score'] = !game_data['options']['show_score']
 }

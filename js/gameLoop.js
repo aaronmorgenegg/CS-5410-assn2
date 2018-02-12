@@ -17,13 +17,15 @@ function ititialize(){
     options = {
         'show_help': false,
         'show_path': false,
-        'show_visited': true
+        'show_visited': true,
+        'show_score': true
     };
     maze = getMaze(10);
     game_data = {
         'textures': textures,
         'options':options,
         'maze':maze,
+        'scores':[],
         'time':{
             'previous':performance.now(),
             'current':0,
@@ -35,18 +37,19 @@ function ititialize(){
                 'x': 0,
                 'y':0
             },
-            'score':0
+            'score':0,
+            'name': undefined
         }
     };
     gameLoop();
 }
 
 function processInput(){
-    
+
 }
 
 function update(){
-    updateTime();
+
 }
 
 function render(){
@@ -56,6 +59,7 @@ function render(){
     renderMaze(canvas, context);
     renderTime();
     renderScore();
+    renderHighScores();
 }
 
 function gameLoop(){
