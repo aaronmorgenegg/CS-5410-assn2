@@ -199,9 +199,9 @@ function renderMazeWalls(context, maze, cellBorder){
     }
 }
 
-function renderMazeShortestPath(context, maze, cellBorder, textures, options){
+function renderMazeShortestPath(context, maze, cellBorder, textures, options, player){
     if(options['show_path']) {
-        if (maze['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
+        if (player['shortest_path'].indexOf(maze[i][j]) > -1) { // if cell is in shortest path
             w = cellBorder['xOffset']/4;
             h = cellBorder['yOffset']/4;
             xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
@@ -211,13 +211,13 @@ function renderMazeShortestPath(context, maze, cellBorder, textures, options){
     }
 }
 
-function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset){
+function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset, player){
     pX = player['coord']['x'];
     pY = player['coord']['y'];
-    player_path_index = maze['shortest_path'].indexOf(maze[pX][pY]);
+    player_path_index = player['shortest_path'].indexOf(maze[pX][pY]);
     if(options['show_help']) {
         if (player_path_index > -1) { // if cell is in shortest path
-            cell = maze['shortest_path'][player_path_index+1]
+            cell = player['shortest_path'][player_path_index+1]
             ppiX = cell['coord']['x'];
             ppiY = cell['coord']['y'];
             context.drawImage(
@@ -228,8 +228,6 @@ function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffs
                 height = yOffset);
         }
     }
-    // TODO: handle if the player is not already on the shortest path
-    // TODO: need to implement stack of misplays
 }
 
 function renderMazeVisited(context, maze, cellBorder, textures, options){
@@ -237,9 +235,9 @@ function renderMazeVisited(context, maze, cellBorder, textures, options){
         if (maze[i][j]['visited']) {
             w = cellBorder['xOffset']/4;
             h = cellBorder['yOffset']/4;
-            xAvg = (cellBorder['x1'] + cellBorder['x2']) / 2;
-            yAvg = (cellBorder['y1'] + cellBorder['y2']) / 2;
-            context.drawImage(img = textures['bread_crumbs'], x = xAvg - w, y = yAvg - h, width = w, height = h);
+            xAvg = (cellBorder['x1'] + cellBorder['x2'])/2;
+            yAvg = (cellBorder['y1'] + cellBorder['y2'])/2;
+            context.drawImage(img = textures['bread_crumbs'], x = xAvg - w/2, y = yAvg - h/2, width = w, height = h);
         }
     }
 }
@@ -247,12 +245,13 @@ function renderMazeVisited(context, maze, cellBorder, textures, options){
 function renderPlayer(context, maze, textures, player, xOffset, yOffset){
     pX = player['coord']['x'];
     pY = player['coord']['y'];
+    cOffset = xOffset * .2;
     context.drawImage(
         img = textures['player'],
-        x = xOffset*pX,
-        y = yOffset*pY,
-        width = xOffset,
-        height = yOffset
+        x = xOffset*pX + cOffset/2,
+        y = yOffset*pY + cOffset/2,
+        width = xOffset - cOffset,
+        height = yOffset - cOffset
     );
 }
 
@@ -271,7 +270,7 @@ function renderHome(context, maze, textures, xOffset, yOffset){
 function renderEnd(context, maze, textures, xOffset, yOffset){
     pX = maze['end_point']['coord']['x'];
     pY = maze['end_point']['coord']['y'];
-    cOffset = xOffset * .2;
+    cOffset = xOffset * .35;
     context.drawImage(
         img = textures['end'],
         x = xOffset*pX + cOffset/2,
@@ -314,12 +313,12 @@ function renderMaze(canvas, context){
             };
 
             renderMazeWalls(context, maze, cellBorder);
-            renderMazeShortestPath(context, maze, cellBorder, textures, options);
+            renderMazeShortestPath(context, maze, cellBorder, textures, options, player);
             renderMazeVisited(context, maze, cellBorder, textures, options);
         }
     }
 
-    renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset);
+    renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset, player);
     renderHome(context, maze, textures, xOffset, yOffset);
     renderEnd(context, maze, textures, xOffset, yOffset);
     renderPlayer(context, maze, textures, player, xOffset, yOffset);

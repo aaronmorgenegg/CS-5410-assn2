@@ -17,8 +17,8 @@ function ititialize(){
     options = {
         'show_help': false,
         'show_path': false,
-        'show_visited': true,
-        'show_score': true
+        'show_visited': false,
+        'show_score': false
     };
     maze = getMaze(10);
     game_data = {
@@ -38,7 +38,8 @@ function ititialize(){
                 'y':0
             },
             'score':0,
-            'name': undefined
+            'name': undefined,
+            'shortest_path': maze['shortest_path']
         }
     };
     gameLoop();
@@ -49,7 +50,7 @@ function processInput(){
 }
 
 function update(){
-
+    updateEndGame();
 }
 
 function render(){
