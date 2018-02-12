@@ -72,3 +72,11 @@ function updateTime(){
 function toggleScoreDisplay(){
     game_data['options']['show_score'] = !game_data['options']['show_score']
 }
+
+function toggleShortestPathDisplay(){
+    game_data['options']['show_path'] = !game_data['options']['show_path']
+}
+
+function toggleBreadcrumbsDisplay(){
+    game_data['options']['show_visited'] = !game_data['options']['show_visited']
+}
