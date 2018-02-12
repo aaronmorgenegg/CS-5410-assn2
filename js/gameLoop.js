@@ -15,8 +15,8 @@ function ititialize(){
         'player': player
     };
     options = {
-        'show_help': true,
-        'show_path': true,
+        'show_help': false,
+        'show_path': false,
         'show_visited': true
     };
     maze = getMaze(10);

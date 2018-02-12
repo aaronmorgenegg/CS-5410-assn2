@@ -123,9 +123,9 @@ function randomPrims(grid){
 function getMaze(size){
     grid = getGrid(size);
     randomPrims(grid);
-    grid.startPoint = grid[0][0];
-    grid.endPoint = grid[grid.size-1][grid.size-1];
-    grid.shortest_path = getShortestPath(grid, grid.startPoint, grid.endPoint);
+    grid.start_point = grid[0][0];
+    grid.end_point = grid[grid.size-1][grid.size-1];
+    grid.shortest_path = getShortestPath(grid, grid.start_point, grid.end_point);
     return grid;
 }
 
@@ -257,11 +257,28 @@ function renderPlayer(context, maze, textures, player, xOffset, yOffset){
 }
 
 function renderHome(context, maze, textures, xOffset, yOffset){
-
+    pX = maze['start_point']['coord']['x'];
+    pY = maze['start_point']['coord']['y'];
+    context.drawImage(
+        img = textures['start'],
+        x = xOffset*pX,
+        y = yOffset*pY,
+        width = xOffset,
+        height = yOffset
+    );
 }
 
 function renderEnd(context, maze, textures, xOffset, yOffset){
-    
+    pX = maze['end_point']['coord']['x'];
+    pY = maze['end_point']['coord']['y'];
+    cOffset = xOffset * .2;
+    context.drawImage(
+        img = textures['end'],
+        x = xOffset*pX + cOffset/2,
+        y = yOffset*pY + cOffset/2,
+        width = xOffset - cOffset,
+        height = yOffset - cOffset
+    );
 }
 
 function renderMaze(canvas, context){
@@ -302,10 +319,10 @@ function renderMaze(canvas, context){
         }
     }
 
-    renderPlayer(context, maze, textures, player, xOffset, yOffset);
     renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset);
     renderHome(context, maze, textures, xOffset, yOffset);
     renderEnd(context, maze, textures, xOffset, yOffset);
+    renderPlayer(context, maze, textures, player, xOffset, yOffset);
 
     context.strokeStyle = '#f00';
     context.lineWidth = 3;
