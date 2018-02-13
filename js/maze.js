@@ -318,7 +318,7 @@ function renderMaze(canvas, context){
     renderEnd(context, maze, textures, xOffset, yOffset);
     renderPlayer(context, maze, textures, player, xOffset, yOffset);
 
-    context.strokeStyle = '#f00';
+    context.strokeStyle = '#fab';
     context.lineWidth = 3;
     context.stroke();
 }
