@@ -118,6 +118,29 @@ function updatePlayer(){
     }
 }
 
+function finalScore(){
+    maze = game_data['maze'];
+    score = game_data['player']['score'];
+
+    // -1 point per second it takes to finish
+    time_penalty = game_data['time']['running_seconds'];
+
+    // + 25 bonus points for not messing up
+    perfection_bonus = 25;
+    for(i = 0; i < maze['size']; i++){
+        for(j = 0; j < maze['size']; j++){
+            if(maze['shortest_path'].indexOf(maze[i][j]) <= -1 && maze[i][j]['visited']){
+                perfection_bonus = 0;
+            }
+        }
+    }
+
+    // bonus points based on size of the maze
+    size_bonus = 2*maze['size'];
+
+    return score - time_penalty + perfection_bonus + size_bonus;
+}
+
 function updateEndGame(){
     maze = game_data['maze'];
     pX = game_data['player']['coord']['x'];
@@ -125,7 +148,7 @@ function updateEndGame(){
     if(maze[pX][pY] === maze['end_point']){
         high_score = {};
         high_score['time'] = game_data['time']['running_seconds'];
-        high_score['score'] = game_data['player']['score'];
+        high_score['score'] = finalScore();
         high_score['size'] = game_data['maze']['size'] + "x" + game_data['maze']['size'];
         if(game_data['player']['name'] === undefined){
             high_score['name'] = prompt("Enter your name to save your high score:", "Anon");
