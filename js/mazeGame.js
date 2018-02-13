@@ -62,7 +62,7 @@ function renderHighScores(){
         text += "Name: " + game_data['scores'][i]['name'] +
             " : Score: " + game_data['scores'][i]['score'] +
             " : Time: " + game_data['scores'][i]['time'] +
-            " : Size: " + game_data['maze']['size'] + "<br>";
+            " : Size: " + game_data['scores'][i]['size'] + "<br>";
     }
     document.getElementById('high_scores').innerHTML = text;
 }
@@ -149,9 +149,9 @@ function updateEndGame(){
         high_score = {};
         high_score['time'] = game_data['time']['running_seconds'];
         high_score['score'] = finalScore();
-        high_score['size'] = game_data['maze']['size'] + "x" + game_data['maze']['size'];
+        high_score['size'] = game_data['maze']['size'] + 'x' + game_data['maze']['size'];
         if(game_data['player']['name'] === undefined){
-            high_score['name'] = prompt("Enter your name to save your high score:", "Anon");
+            high_score['name'] = prompt('Enter your name to save your high score:', 'Anon');
             if(high_score['name'] === null || high_score['name'] === ""){
                 high_score['name'] = "Anon";
             }
