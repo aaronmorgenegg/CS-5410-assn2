@@ -216,12 +216,14 @@ function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffs
         cell = player['shortest_path'][1];
         ppiX = cell['coord']['x'];
         ppiY = cell['coord']['y'];
+        cOffset = xOffset * .5;
         context.drawImage(
             img = textures['help_marker'],
-            x = xOffset * ppiX,
-            y = yOffset * ppiY,
-            width = xOffset,
-            height = yOffset);
+            x = xOffset * ppiX + cOffset/2,
+            y = yOffset * ppiY + cOffset/2,
+            width = xOffset - cOffset,
+            height = yOffset - cOffset
+        );
     }
 }
 
@@ -280,8 +282,6 @@ function renderMaze(canvas, context){
     textures = game_data['textures'];
     player = game_data['player'];
 
-    // clearCanvas(canvas, context);
-
     // Background
     drawRectangle(context,
         {
@@ -308,8 +308,8 @@ function renderMaze(canvas, context){
             };
 
             renderMazeWalls(context, maze, cellBorder);
-            renderMazeShortestPath(context, maze, cellBorder, textures, options, player);
             renderMazeVisited(context, maze, cellBorder, textures, options);
+            renderMazeShortestPath(context, maze, cellBorder, textures, options, player);
         }
     }
 

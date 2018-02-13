@@ -6,12 +6,13 @@ function ititialize(){
     player = document.getElementById("icon_mouse");
     cheese = document.getElementById("icon_cheese");
     home = document.getElementById("icon_home");
+    path = document.getElementById("icon_path");
     textures = {
         'bread_crumbs': bread_crumbs,
         'start': home,
         'end': cheese,
-        'path_marker': bread_crumbs,
-        'help_marker': bread_crumbs,
+        'path_marker': path,
+        'help_marker': path,
         'player': player
     };
     options = {
