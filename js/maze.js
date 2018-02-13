@@ -211,22 +211,17 @@ function renderMazeShortestPath(context, maze, cellBorder, textures, options, pl
     }
 }
 
-function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset, player){
-    pX = player['coord']['x'];
-    pY = player['coord']['y'];
-    player_path_index = player['shortest_path'].indexOf(maze[pX][pY]);
-    if(options['show_help']) {
-        if (player_path_index > -1) { // if cell is in shortest path
-            cell = player['shortest_path'][player_path_index+1]
-            ppiX = cell['coord']['x'];
-            ppiY = cell['coord']['y'];
-            context.drawImage(
-                img = textures['help_marker'],
-                x = xOffset * ppiX,
-                y = yOffset * ppiY,
-                width = xOffset,
-                height = yOffset);
-        }
+function renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset){
+    if(options['show_help'] && player['shortest_path'].length >= 2) {
+        cell = player['shortest_path'][1];
+        ppiX = cell['coord']['x'];
+        ppiY = cell['coord']['y'];
+        context.drawImage(
+            img = textures['help_marker'],
+            x = xOffset * ppiX,
+            y = yOffset * ppiY,
+            width = xOffset,
+            height = yOffset);
     }
 }
 
@@ -318,7 +313,7 @@ function renderMaze(canvas, context){
         }
     }
 
-    renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset, player);
+    renderMazeHelp(context, maze, textures, options, player, xOffset, yOffset);
     renderHome(context, maze, textures, xOffset, yOffset);
     renderEnd(context, maze, textures, xOffset, yOffset);
     renderPlayer(context, maze, textures, player, xOffset, yOffset);

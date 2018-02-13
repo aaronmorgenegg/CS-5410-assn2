@@ -11,7 +11,6 @@
 	<img id="icon_cheese" width="1" height="1" src="images/icon_cheese.png">
 	<img id="icon_home" width="1" height="1" src="images/icon_home.png">
 
-
 	<table>
 		<tr>
 			<td>
@@ -19,21 +18,13 @@
 			</td>
 			<td>
 				<div id="gui">
-					<input type="button" id="button_5x5" onclick="updateMazeSize(5)" value="5x5">
-					<input type="button" id="button_10x10" onclick="updateMazeSize(10)" value="10x10">
-					<input type="button" id="button_15x15" onclick="updateMazeSize(15)" value="15x15">
-					<input type="button" id="button_20x20" onclick="updateMazeSize(20)" value="20x20">
-					<input type="button" id="button_score" onclick="toggleScoreDisplay()" value="Toggle Score">
-					<input type="button" id="button_shortest_path" onclick="toggleShortestPathDisplay()" value="Toggle Shortest Path">
-					<input type="button" id="button_breadcrumbs" onclick="toggleBreadcrumbsDisplay()" value="Toggle Breadcrumbs">
-					<input type="button" id="button_up" onclick="movePlayer('u')" value="up">
-					<input type="button" id="button_right" onclick="movePlayer('r')" value="right">
-					<input type="button" id="button_down" onclick="movePlayer('d')" value="down">
-					<input type="button" id="button_left" onclick="movePlayer('l')" value="left">
+					<input type="button" id="button_5x5" onclick="resetGame(5)" value="5x5">
+					<input type="button" id="button_10x10" onclick="resetGame(10)" value="10x10">
+					<input type="button" id="button_15x15" onclick="resetGame(15)" value="15x15">
+					<input type="button" id="button_20x20" onclick="resetGame(20)" value="20x20">
 					<div id="time"></div>
 					<div id="score"></div>
 					<div id="high_scores"></div>
-					<div id="controls">Control Scheme: <br> Movement: Arrow keys, WASD, IJKL <br> Toggle Hint: H <br> Toggle Breadcrumbs: B <br> Toggle Shortest Path: P <br> Toggle Score: Y <br></div>
 				</div>
 			</td>
 		</tr>

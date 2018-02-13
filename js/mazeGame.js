@@ -7,42 +7,41 @@ function movePlayer(direction){
     if(direction === 'u'){
         if(maze[pX][pY]['u'] === true){
             game_data['player']['coord']['y'] -= 1;
-            updatePlayer();
-            return;
+            return true;
         }
     }
     if(direction === 'r'){
         if(maze[pX][pY]['r'] === true){
             game_data['player']['coord']['x'] += 1;
-            updatePlayer();
-            return;
+            return true;
         }
     }
     if(direction === 'd'){
         if(maze[pX][pY]['d'] === true){
             game_data['player']['coord']['y'] += 1;
-            updatePlayer();
-            return;
+            return true;
         }
     }
     if(direction === 'l'){
         if(maze[pX][pY]['l'] === true){
             game_data['player']['coord']['x'] -= 1;
-            updatePlayer();
-            return;
+            return true;
         }
     }
+    return false;
 }
 
-function updateMazeSize(size){
-    // Resets maze to given size when button is pressed
-    resetGame();
+function resetGame(size){
     game_data['maze'] = getMaze(size);
-}
-
-function resetGame(){
     game_data['player']['coord'] = {'x': 0, 'y': 0};
     game_data['player']['score'] = 0;
+    game_data['player']['shortest_path'] = game_data['maze']['shortest_path'];
+    game_data['time'] = {
+            'previous':performance.now(),
+            'current':0,
+            'elapsed':0,
+            'running':0
+        };
 }
 
 function renderTime(){
@@ -78,38 +77,44 @@ function updateTime(){
 }
 
 function toggleScoreDisplay(){
-    game_data['options']['show_score'] = !game_data['options']['show_score']
+    game_data['options']['show_score'] = !game_data['options']['show_score'];
+}
+
+function toggleHelpDisplay(){
+    game_data['options']['show_help'] = !game_data['options']['show_help'];
 }
 
 function toggleShortestPathDisplay(){
-    game_data['options']['show_path'] = !game_data['options']['show_path']
+    game_data['options']['show_path'] = !game_data['options']['show_path'];
 }
 
 function toggleBreadcrumbsDisplay(){
-    game_data['options']['show_visited'] = !game_data['options']['show_visited']
+    game_data['options']['show_visited'] = !game_data['options']['show_visited'];
 }
 
 function updatePlayer(){
-    maze = game_data['maze'];
-    player = game_data['player'];
-    pX = game_data['player']['coord']['x'];
-    pY = game_data['player']['coord']['y'];
+    if(movePlayer(game_data['player']['input'])){
+        maze = game_data['maze'];
+        player = game_data['player'];
+        pX = player['coord']['x'];
+        pY = player['coord']['y'];
 
-    // +5 for a correct square, -1 for incorrect square
-    if(maze[pX][pY]['visited'] === false){
-        if(maze['shortest_path'].indexOf(maze[pX][pY]) > -1){
-            game_data['player']['score'] += 5;
+        // +5 for a correct square, -1 for incorrect square
+        if (maze[pX][pY]['visited'] === false) {
+            if (maze['shortest_path'].indexOf(maze[pX][pY]) > -1) {
+                game_data['player']['score'] += 5;
+            }
+            else {
+                game_data['player']['score'] -= 1;
+            }
+            maze[pX][pY]['visited'] = true;
         }
-        else {
-            game_data['player']['score'] -= 1;
-        }
-        maze[pX][pY]['visited'] = true;
-    }
 
-    if(player['shortest_path'].indexOf(maze[pX][pY]) > -1){
-        game_data['player']['shortest_path'].shift();
-    } else {
-        game_data['player']['shortest_path'].splice(0, 0, maze[pX][pY]);
+        if (player['shortest_path'].indexOf(maze[pX][pY]) > -1) {
+            game_data['player']['shortest_path'].shift();
+        } else {
+            game_data['player']['shortest_path'].unshift(maze[pX][pY]);
+        }
     }
 }
 
@@ -131,6 +136,49 @@ function updateEndGame(){
             high_score['name'] = game_data['player']['name'];
         }
         game_data['scores'].push(high_score);
-        updateMazeSize(game_data['maze']['size']);
+        resetGame(game_data['maze']['size']);
+    }
+}
+
+function updateInput(){
+    input = game_data['player']['input'];
+    if(input === 'h'){
+        toggleHelpDisplay();
+    } if(input === 'b'){
+        toggleBreadcrumbsDisplay();
+    } if(input === 'p'){
+        toggleShortestPathDisplay();
+    } if(input === 'y') {
+        toggleScoreDisplay();
+    } else{
+        updatePlayer();
+    }
+    game_data['player']['input'] = '';
+}
+
+function onKeyDown(e){
+    if(e.keyCode === 87 || e.keyCode === 73 || e.keyCode === 38){
+        game_data['player']['input'] = 'u';
+    }
+    if(e.keyCode === 68 || e.keyCode === 76 || e.keyCode === 39){
+        game_data['player']['input'] = 'r';
+    }
+    if(e.keyCode === 83 || e.keyCode === 75 || e.keyCode === 40){
+        game_data['player']['input'] = 'd';
+    }
+    if(e.keyCode === 65 || e.keyCode === 74 || e.keyCode === 37){
+        game_data['player']['input'] = 'l';
+    }
+    if(e.keyCode === 72){
+        game_data['player']['input'] = 'h';
+    }
+    if(e.keyCode === 66){
+        game_data['player']['input'] = 'b';
+    }
+    if(e.keyCode === 80){
+        game_data['player']['input'] = 'p';
+    }
+    if(e.keyCode === 89){
+        game_data['player']['input'] = 'y';
     }
 }

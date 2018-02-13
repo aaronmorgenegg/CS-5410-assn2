@@ -39,10 +39,12 @@ function ititialize(){
             },
             'score':0,
             'name': undefined,
-            'shortest_path': maze['shortest_path']
+            'shortest_path': maze['shortest_path'],
+            'input': ''
         }
     };
-    gameLoop();
+    document.addEventListener('keydown', onKeyDown);
+    requestAnimationFrame(gameLoop);
 }
 
 function processInput(){
@@ -50,6 +52,7 @@ function processInput(){
 }
 
 function update(){
+    updateInput();
     updateEndGame();
 }
 
@@ -64,7 +67,6 @@ function render(){
 }
 
 function gameLoop(){
-    // console.log(game_data['time']);
     updateTime();
 
     processInput();
