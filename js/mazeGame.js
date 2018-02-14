@@ -49,8 +49,9 @@ function renderTime(){
 }
 
 function renderScore(){
+    score = game_data['player']['score'] - game_data['time']['running_seconds'];
     if(game_data['options']['show_score']) {
-        document.getElementById('score').innerHTML = "Score: " + game_data['player']['score'];
+        document.getElementById('score').innerHTML = "Score: " + score;
     } else {
         document.getElementById('score').innerHTML = "Score: Hidden";
     }
