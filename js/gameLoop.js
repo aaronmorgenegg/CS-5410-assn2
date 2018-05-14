@@ -53,7 +53,7 @@ function processInput(){
 }
 
 function update(){
-    updateInput();
+    updateMovement();
     updateEndGame();
 }
 
